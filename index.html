@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <title>To-Do List</title>
+</head>
+<body>
+    <h1>To-Do List</h1>
+    <form>
+        <input type="text" id="task" placeholder="Add a task...">
+        <button type="submit" onclick="addTask()">Add</button>
+    </form>
+    <ul id="list"></ul>
+    <script>
+    function addTask() {
+        // Get the task from the input field
+        var task = document.getElementById("task").value;
+      
+        // Send an HTTP request to the server to store the task
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "add_task.php", true);
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                // Get the list of tasks from the server
+                getTasks();
+            }
+        };
+        xhr.send("task=" + task);
+    }
+
+    function getTasks() {
+        // Send an HTTP request to the server to get the list of tasks
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "get_tasks.php", true);
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                // Clear the list
+                document.getElementById("list").innerHTML = "";
+              
+                // Parse the JSON response
+                var tasks = JSON.parse(xhr.responseText);
+              
+                // Add each task to the list
+                for (var i = 0; i < tasks.length; i++) {
+                    var li = document.createElement("li");
+                    li.innerHTML = tasks[i].task;
+                    document.getElementById("list").appendChild(li);
+                }
+            }
+        };
+        xhr.send();
+    }
+    </script>
+</body>
+</html>
